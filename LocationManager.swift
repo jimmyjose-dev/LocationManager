@@ -39,6 +39,11 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         initLocationManager()
     }
     
+    func stop(){
+        //locationManager.stopUpdatingLocation()
+        locationManager.stopMonitoringSignificantLocationChanges()
+    }
+    
     func initLocationManager() {
         
         

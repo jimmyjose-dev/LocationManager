@@ -48,7 +48,8 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         
         //locationManager.requestAlwaysAuthorization()
-        locationManager.startUpdatingLocation()
+        //locationManager.startUpdatingLocation()
+        locationManager.startMonitoringSignificantLocationChanges()
     }
     
     
@@ -87,7 +88,8 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
             }
             
             if (hasAuthorised == true) {
-                locationManager.startUpdatingLocation()
+                locationManager.startMonitoringSignificantLocationChanges()
+                //locationManager.startUpdatingLocation()
             }else{
                 
                 if (delegate? != nil){

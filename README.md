@@ -1,7 +1,7 @@
 LocationManager
 =====================
 
-CLLocationManager wrapper written in Swift
+CLLocationManager wrapper in Swift
 
 Three helpful delegates in LocationManager
 

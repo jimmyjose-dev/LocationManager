@@ -3,11 +3,12 @@ LocationManager
 
 CLLocationManager wrapper in Swift
 
-Three helpful delegates in LocationManager
+Delegates in LocationManager
 
-    func locationFound(latitude:NSString, longitude:NSString)
-    func locationManagerStatus(status:NSString)
-    func locationManagerHasError(error:NSString)
+    optional func locationFoundGetAsString(latitude:NSString, longitude:NSString)
+    func locationFound(latitude:Double, longitude:Double)
+    optional func locationManagerStatus(status:NSString)
+    optional func locationManagerReceivedError(error:NSString)
 
 ----------
 

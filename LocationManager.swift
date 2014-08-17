@@ -61,7 +61,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
         locationManager.stopUpdatingLocation()
         if delegate? != nil{
-            delegate?.locationManagerHasError(error.localizedDescription)
+            delegate?.locationManagerReceivedError!(error.localizedDescription)
         }
     }
     
@@ -71,7 +71,8 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         var location = arrayOfLocation.lastObject as CLLocation
         var coordLatLon = location.coordinate
         if delegate? != nil{
-            delegate?.locationFound(coordLatLon.latitude.description,longitude: coordLatLon.longitude.description)
+            delegate?.locationFoundGetAsString!(coordLatLon.latitude.description,longitude: coordLatLon.longitude.description)
+            delegate?.locationFound(coordLatLon.latitude,longitude: coordLatLon.longitude)
         }
     }
     
@@ -98,7 +99,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
             }else{
                 
                 if (delegate? != nil){
-                    delegate?.locationManagerStatus(locationStatus)
+                    delegate?.locationManagerStatus!(locationStatus)
                     
                 }
             }
@@ -109,8 +110,9 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
 
 @objc protocol LocationManagerDelegate : NSObjectProtocol
 {
-    func locationFound(latitude:NSString, longitude:NSString)
-    func locationManagerStatus(status:NSString)
-    func locationManagerHasError(error:NSString)
+    optional func locationFoundGetAsString(latitude:NSString, longitude:NSString)
+    func locationFound(latitude:Double, longitude:Double)
+    optional func locationManagerStatus(status:NSString)
+    optional func locationManagerReceivedError(error:NSString)
 }
 

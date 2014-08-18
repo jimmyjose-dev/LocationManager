@@ -15,8 +15,24 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     
     var delegate:LocationManagerDelegate? = nil
     
-    var latitude:String = ""
-    var longitude:String = ""
+    var latitude:Double = 0.0
+    var longitude:Double = 0.0
+    
+    var latitudeAsString:String = ""
+    var longitudeAsString:String = ""
+    
+    
+    var lastKnownLatitude:Double = 0.0
+    var lastKnownLongitude:Double = 0.0
+    
+    var lastKnownLatitudeAsString:String = ""
+    var lastKnownLongitudeAsString:String = ""
+    
+    
+    var keepLastKnownLocation:Bool = true
+    var hasLastKnownLocation:Bool = true
+    
+    var autoUpdate:Bool = false
     
     var locationManager: CLLocationManager!
     
@@ -28,56 +44,127 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     }
     
     
-    override init(){
+    private override init(){
         
         super.init()
+        if(!autoUpdate){
+            autoUpdate = !CLLocationManager.significantLocationChangeMonitoringAvailable()
+        }
         
     }
     
-    func start(){
+    private func resetLatLon(){
+        
+        latitude = 0.0
+        longitude = 0.0
+        
+        latitudeAsString = ""
+        longitudeAsString = ""
+        
+    }
+    
+    private func resetLastKnownLatLon(){
+        
+        hasLastKnownLocation = false
+        
+        lastKnownLatitude = 0.0
+        lastKnownLongitude = 0.0
+        
+        lastKnownLatitudeAsString = ""
+        lastKnownLongitudeAsString = ""
+        
+    }
+    
+    func startUpdatingLocation(){
         
         initLocationManager()
     }
     
-    func stop(){
-        //locationManager.stopUpdatingLocation()
-        locationManager.stopMonitoringSignificantLocationChanges()
+    func stopUpdatingLocation(){
+        if(autoUpdate){
+            locationManager.stopUpdatingLocation()
+        }else{
+            
+            locationManager.stopMonitoringSignificantLocationChanges()
+        }
+        
+        
+        resetLatLon()
+        if(!keepLastKnownLocation){
+            resetLastKnownLatLon()
+        }
     }
     
-    func initLocationManager() {
+    private func initLocationManager() {
         
+        // App might be unreliable if someone changes autoupdate status in between and stops it
         
         locationManager = CLLocationManager()
         locationManager.delegate = self
         // locationManager.locationServicesEnabled
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         
+        //check for iOS8 thingy in next update
         //locationManager.requestAlwaysAuthorization()
-        //locationManager.startUpdatingLocation()
-        locationManager.startMonitoringSignificantLocationChanges()
+        
+        if(autoUpdate){
+            
+            locationManager.startUpdatingLocation()
+        }else{
+            
+            locationManager.startMonitoringSignificantLocationChanges()
+        }
+        
+        
     }
     
     
-    func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
+    internal func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
+        
         locationManager.stopUpdatingLocation()
-        if delegate? != nil{
+        resetLatLon()
+        if(!keepLastKnownLocation){
+            
+            resetLastKnownLatLon()
+        }
+        
+        if ((delegate? != nil) && (delegate?.respondsToSelector(Selector("locationManagerReceivedError:")))!){
             delegate?.locationManagerReceivedError!(error.localizedDescription)
         }
     }
     
-    func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
+    internal func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         
         var arrayOfLocation = locations as NSArray
         var location = arrayOfLocation.lastObject as CLLocation
         var coordLatLon = location.coordinate
-        if delegate? != nil{
-            delegate?.locationFoundGetAsString!(coordLatLon.latitude.description,longitude: coordLatLon.longitude.description)
-            delegate?.locationFound(coordLatLon.latitude,longitude: coordLatLon.longitude)
+        
+        latitude  = coordLatLon.latitude
+        longitude = coordLatLon.longitude
+        
+        latitudeAsString  = coordLatLon.latitude.description
+        longitudeAsString = coordLatLon.longitude.description
+        
+        lastKnownLatitude = coordLatLon.latitude
+        lastKnownLongitude = coordLatLon.longitude
+        
+        lastKnownLatitudeAsString = coordLatLon.latitude.description
+        lastKnownLongitudeAsString = coordLatLon.longitude.description
+        
+        hasLastKnownLocation = true
+        
+        if (delegate? != nil){
+            if((delegate?.respondsToSelector(Selector("locationFoundGetAsString:longitude:")))!){
+                delegate?.locationFoundGetAsString!(latitudeAsString,longitude:longitudeAsString)
+            }
+            if((delegate?.respondsToSelector(Selector("locationFound:longitude:")))!){
+                delegate?.locationFound(latitude,longitude:longitude)
+            }
         }
     }
     
     
-    func locationManager(manager: CLLocationManager!,
+    internal func locationManager(manager: CLLocationManager!,
         didChangeAuthorizationStatus status: CLAuthorizationStatus) {
             var hasAuthorised = false
             var locationStatus : NSString = "Calibrating"
@@ -98,9 +185,10 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                 //locationManager.startUpdatingLocation()
             }else{
                 
-                if (delegate? != nil){
+                resetLatLon()
+                
+                if ((delegate? != nil) && (delegate?.respondsToSelector(Selector("locationManagerStatus:")))!){
                     delegate?.locationManagerStatus!(locationStatus)
-                    
                 }
             }
             
@@ -110,8 +198,8 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
 
 @objc protocol LocationManagerDelegate : NSObjectProtocol
 {
-    optional func locationFoundGetAsString(latitude:NSString, longitude:NSString)
     func locationFound(latitude:Double, longitude:Double)
+    optional func locationFoundGetAsString(latitude:NSString, longitude:NSString)
     optional func locationManagerStatus(status:NSString)
     optional func locationManagerReceivedError(error:NSString)
 }

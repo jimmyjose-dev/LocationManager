@@ -9,6 +9,9 @@ Delegates in LocationManager
     optional func locationFoundGetAsString(latitude:NSString, longitude:NSString)
     optional func locationManagerStatus(status:NSString)
     optional func locationManagerReceivedError(error:NSString)
+    
+    
+GetLastKnownLocation
 
 ----------
 

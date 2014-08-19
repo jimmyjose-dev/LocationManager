@@ -24,8 +24,22 @@ Delegates in LocationManager
 
 ----------
 
+Verbose Message based on CLAuthorizationStatus
+---------------
 
+ - App is Authorized to use location services.
  
+ - You have not yet made a choice with regards to this application.
+ 
+ - This application is not authorized to use location services. Due to
+   active restrictions on location services, the user cannot change this
+   status, and may not have personally denied authorization.
+
+ - You have explicitly denied authorization for this application, or
+   location services are disabled in Settings.
+
+----------
+
 
 Sample code
 -----------

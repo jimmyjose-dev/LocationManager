@@ -44,10 +44,6 @@ Verbose Message based on CLAuthorizationStatus
 Sample code
 -----------
 
-
-----------
-
-
 **Closure**
 
     var locationManager = LocationManager.sharedInstance
@@ -66,7 +62,6 @@ Sample code
 **Delegate**
 
 
-----------
 
     *class ViewController: UIViewController ,LocationManagerDelegate{....*
     

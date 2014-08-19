@@ -12,6 +12,10 @@ import CoreLocation
 
 class LocationManager: NSObject,CLLocationManagerDelegate {
     
+    var completionHandler:((latitude:Double, longitude:Double, status:String, verboseMessage:String, error:String?)->())?
+    
+    var locationStatus : NSString = "Calibrating"// to pass in handler
+    
     
     var delegate:LocationManagerDelegate? = nil
     
@@ -36,6 +40,17 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     
     var locationManager: CLLocationManager!
     
+    var showVerboseMessage = false
+    
+    
+    private var verboseMessage = "Calibrating"
+    
+    private let verboseMessageDictionary = [CLAuthorizationStatus.NotDetermined:"You have not yet made a choice with regards to this application.",
+        CLAuthorizationStatus.Restricted:"This application is not authorized to use location services. Due to active restrictions on location services, the user cannot change this status, and may not have personally denied authorization.",
+        CLAuthorizationStatus.Denied:"You have explicitly denied authorization for this application, or location services are disabled in Settings.",
+        CLAuthorizationStatus.Authorized:"App is Authorized to use location services.",CLAuthorizationStatus.AuthorizedWhenInUse:"You have granted authorization to use your location only when the app is visible to you."]
+    
+    
     class var sharedInstance : LocationManager {
     struct Static {
         static let instance : LocationManager = LocationManager()
@@ -44,9 +59,11 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     }
     
     
+    
     private override init(){
         
         super.init()
+        
         if(!autoUpdate){
             autoUpdate = !CLLocationManager.significantLocationChangeMonitoringAvailable()
         }
@@ -74,6 +91,14 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         lastKnownLongitudeAsString = ""
         
     }
+    
+    func startUpdatingLocation(completionHandler:((latitude:Double, longitude:Double, status:String, verboseMessage:String, error:String?)->())? = nil){
+        
+        self.completionHandler = completionHandler
+        
+        initLocationManager()
+    }
+    
     
     func startUpdatingLocation(){
         
@@ -128,6 +153,10 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
             resetLastKnownLatLon()
         }
         
+        var verbose = ""
+        if showVerboseMessage {verbose = verboseMessage}
+        completionHandler?(latitude: 0.0, longitude: 0.0, status: locationStatus, verboseMessage:verbose,error: error.localizedDescription)
+        
         if ((delegate? != nil) && (delegate?.respondsToSelector(Selector("locationManagerReceivedError:")))!){
             delegate?.locationManagerReceivedError!(error.localizedDescription)
         }
@@ -144,6 +173,10 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
         latitudeAsString  = coordLatLon.latitude.description
         longitudeAsString = coordLatLon.longitude.description
+        
+        var verbose = ""
+        if showVerboseMessage {verbose = verboseMessage}
+        completionHandler?(latitude: latitude, longitude: longitude, status: locationStatus,verboseMessage:verbose, error: nil)
         
         lastKnownLatitude = coordLatLon.latitude
         lastKnownLongitude = coordLatLon.longitude
@@ -167,7 +200,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     internal func locationManager(manager: CLLocationManager!,
         didChangeAuthorizationStatus status: CLAuthorizationStatus) {
             var hasAuthorised = false
-            var locationStatus : NSString = "Calibrating"
+            var verboseKey = status
             switch status {
             case CLAuthorizationStatus.Restricted:
                 locationStatus = "Restricted Access"
@@ -180,13 +213,34 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                 hasAuthorised = true
             }
             
+            verboseMessage = verboseMessageDictionary[verboseKey]!
+            
             if (hasAuthorised == true) {
-                locationManager.startMonitoringSignificantLocationChanges()
-                //locationManager.startUpdatingLocation()
+                if(autoUpdate){
+                    
+                    locationManager.startUpdatingLocation()
+                }else{
+                    
+                    locationManager.startMonitoringSignificantLocationChanges()
+                }
             }else{
                 
                 resetLatLon()
-                
+                if (!locationStatus.isEqualToString("Denied access")){
+                    
+                    var verbose = ""
+                    if showVerboseMessage {
+                        
+                        verbose = verboseMessage
+                        
+                        if ((delegate? != nil) && (delegate?.respondsToSelector(Selector("locationManagerVerboseMessage:")))!){
+                        
+                            delegate?.locationManagerVerboseMessage!(verbose)
+                        
+                        }
+                    }
+                    completionHandler?(latitude: latitude, longitude: longitude, status: locationStatus, verboseMessage:verbose,error: nil)
+                }
                 if ((delegate? != nil) && (delegate?.respondsToSelector(Selector("locationManagerStatus:")))!){
                     delegate?.locationManagerStatus!(locationStatus)
                 }
@@ -202,5 +256,6 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     optional func locationFoundGetAsString(latitude:NSString, longitude:NSString)
     optional func locationManagerStatus(status:NSString)
     optional func locationManagerReceivedError(error:NSString)
+    optional func locationManagerVerboseMessage(message:NSString)
 }
 

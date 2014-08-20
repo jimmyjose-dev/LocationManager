@@ -1,7 +1,7 @@
 LocationManager
 =====================
 
-CLLocationManager wrapper in Swift
+CLLocationManager wrapper in Swift, performs location update, geocoding and reverse geocoding with both Apple and Google service
 
 Closure
 

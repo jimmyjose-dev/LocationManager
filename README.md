@@ -126,7 +126,7 @@ Sample code
 
 **Delegate**
 
-
+**Location update**
 
     *class ViewController: UIViewController ,LocationManagerDelegate{....*
     

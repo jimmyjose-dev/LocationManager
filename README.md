@@ -1,7 +1,7 @@
 LocationManager
 =====================
 
-CLLocationManager wrapper in Swift, performs location update, geocoding and reverse geocoding with both Apple and Google service
+CLLocationManager wrapper in Swift
 
 Closure
 
@@ -46,6 +46,8 @@ Sample code
 
 **Closure**
 
+**Location update**
+
     var locationManager = LocationManager.sharedInstance
             locationManager.showVerboseMessage = true
             locationManager.autoUpdate = false
@@ -55,6 +57,69 @@ Sample code
                 
                 println(verboseMessage)
                 
+            }
+
+**Geocoding using Apple service**
+
+ 
+
+    var locationManager = LocationManager.sharedInstance
+            
+    locationManager.geocodeAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (address, error) -> Void in
+                
+                if(error != nil){
+                    
+                    println(error)
+                }else{
+                    
+                    println(address!)
+                }
+            }
+            
+
+**Reverse Geocoding using Apple service**
+
+    var locationManager = LocationManager.sharedInstance
+                locationManager.reverseGeocodeLocationWithLatLon(latitude: 37.331789, longitude: -122.029620) { (address, error) -> Void in
+                
+                if(error != nil){
+                    
+                    println(error)
+                }else{
+                    
+                    println(address!)
+                }
+                
+            }
+
+**Geocoding using Google service**
+
+    var locationManager = LocationManager.sharedInstance
+       locationManager.geocodeUsingGoogleAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (address, error) -> Void in
+                
+                if(error != nil){
+                    
+                    println(error)
+                }else{
+                    
+                    println(address!)
+                }
+                
+            }
+
+
+**Reverse Geocoding using Google service**
+
+    var locationManager = LocationManager.sharedInstance
+          locationManager.reverseGeocodeLocationUsingGoogleWithLatLon(latitude: 37.331789, longitude: -122.029620) { (address, error) -> Void in
+                
+                if(error != nil){
+                    
+                    println(error)
+                }else{
+                    
+                    println(address!)
+                }
             }
 
 ----------

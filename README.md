@@ -5,7 +5,9 @@ CLLocationManager wrapper in Swift
 ----------------------------------
 **Features:**
 >  1) Location update with closure & delegate support 
+>  
 >  2) Geocoding and reverse geocoding using Apple service 
+>  
 >  3) Geocoding and reverse geocoding using Google service
 
 

@@ -2,56 +2,25 @@ LocationManager
 =====================
 
 CLLocationManager wrapper in Swift
-
-Closure
-
-    completionHandler:((latitude:Double, longitude:Double, status:String, verboseMessage:String, error:String?)
-
-
-----------
+----------------------------------
+**Features:**
+>  1) Location update with closure & delegate support 
+>  2) Geocoding and reverse geocoding using Apple service 
+>  3) Geocoding and reverse geocoding using Google service
 
 
-Delegates in LocationManager
-
-	func locationFound(latitude:Double, longitude:Double)
-    optional func locationFoundGetAsString(latitude:NSString, longitude:NSString)
-    optional func locationManagerStatus(status:NSString)
-    optional func locationManagerReceivedError(error:NSString)
-    optional func locationManagerVerboseMessage(message:NSString)
-    
- 
-
-
-----------
-
-Verbose Message based on CLAuthorizationStatus
----------------
-
- - App is Authorized to use location services.
- 
- - You have not yet made a choice with regards to this application.
- 
- - This application is not authorized to use location services. Due to
-   active restrictions on location services, the user cannot change this
-   status, and may not have personally denied authorization.
-
- - You have explicitly denied authorization for this application, or
-   location services are disabled in Settings.
-
-----------
 
 
 Sample code
 -----------
-
-**Closure**
+***Closure***
 
 **Location update**
 
     var locationManager = LocationManager.sharedInstance
             locationManager.showVerboseMessage = true
             locationManager.autoUpdate = false
-            locationManager.startUpdatingLocation { (latitude, longitude, status, verboseMessage, error) -> () in
+            locationManager.startUpdatingLocationWithCompletionHandler { (latitude, longitude, status, verboseMessage, error) -> () in
                 
                 println("lat:\(latitude) lon:\(longitude) status:\(status) error:\(error)")
                 
@@ -124,41 +93,68 @@ Sample code
 
 ----------
 
-**Delegate**
+***Delegate***
 
 **Location update**
 
     *class ViewController: UIViewController ,LocationManagerDelegate{....*
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
-
+        
         var locationManager = LocationManager.sharedInstance
+        
         locationManager.delegate = self
-        }
+        
+        locationManager.startUpdatingLocation()
+        
+        locationManager.stopUpdatingLocation()
+    }
     
      func locationManagerStatus(status:NSString){
+        
         println(status)
-        }
-        
+    }
+    
+    
     func locationManagerReceivedError(error:NSString){
-        println(error)
-        }
         
-        func locationFoundGetAsString(latitude: NSString, longitude: NSString) {
+        println(error)
+        
+    }
+    
+    func locationFoundGetAsString(latitude: NSString, longitude: NSString) {
+        
         println(latitude)
         println(longitude)
-        }
+    }
+    
+    
+    func locationFound(latitude:Double, longitude:Double){
         
         
-        func locationFound(latitude:Double, longitude:Double){
-            
-        }
+    }
 
 ----------
 
+Verbose Message based on CLAuthorizationStatus
+---------------
 
-Add Privacy - Location Usage Description  and NSLocationWhenInUseUsageDescription in your plist
+ - App is Authorized to use location services.
+ 
+ - You have not yet made a choice with regards to this application.
+ 
+ - This application is not authorized to use location services. Due to
+   active restrictions on location services, the user cannot change this
+   status, and may not have personally denied authorization.
+
+ - You have explicitly denied authorization for this application, or
+   location services are disabled in Settings.
+
+----------
+
+***Add Privacy - Location Usage Description  and NSLocationWhenInUseUsageDescription in your plist***
 
 
 Roadmap

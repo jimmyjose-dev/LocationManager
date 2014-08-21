@@ -13,7 +13,7 @@ typealias LMReverseGeocodeCompletionHandler = ((address:NSDictionary?, error:Str
 typealias LMGeocodeCompletionHandler = ((address:NSDictionary?, error:String?)->Void)?
 typealias LMLocationCompletionHandler = ((latitude:Double, longitude:Double, status:String, verboseMessage:String, error:String?)->())?
 
-
+// Todo: Keep completion handler differerent for all services, otherwise only one will work
 
 
 class LocationManager: NSObject,CLLocationManagerDelegate {
@@ -101,7 +101,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
     }
     
-    func startUpdatingLocation(completionHandler:((latitude:Double, longitude:Double, status:String, verboseMessage:String, error:String?)->())? = nil){
+    func startUpdatingLocationWithCompletionHandler(completionHandler:((latitude:Double, longitude:Double, status:String, verboseMessage:String, error:String?)->())? = nil){
         
         self.completionHandler = completionHandler
         
@@ -410,8 +410,8 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     func reverseGeocodeLocationUsingGoogleWithLatLon(#latitude:Double, longitude: Double,onReverseGeocodingCompletionHandler:((address:NSDictionary?, error:String?)->Void)?){
         
         self.reverseGeocodingCompletionHandler = onReverseGeocodingCompletionHandler
-        reverseGocodeUsingGoogle(latitude:latitude,longitude: longitude)
         
+        reverseGocodeUsingGoogle(latitude: latitude, longitude: longitude)
         
     }
     
@@ -425,44 +425,54 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     }
     
     
-    private func reverseGocodeUsingGoogle(#latitude:Double, longitude: Double){
     
+    
+    private func reverseGocodeUsingGoogle(#latitude:Double, longitude: Double){
+        
         var urlString = "http://maps.googleapis.com/maps/api/geocode/json?latlng=\(latitude),\(longitude)&sensor=true" as NSString
         
         urlString = urlString.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
         
-    
+        
         let url:NSURL = NSURL(string:urlString)
         
         let request:NSURLRequest = NSURLRequest(URL:url)
         
         let queue:NSOperationQueue = NSOperationQueue()
         
+        /*
+        let url = NSURL(string:urlString)
+        var session = NSURLSession.sharedSession()
+
+        var task:NSURLSessionDataTask = session.dataTaskWithURL(url, completionHandler:apiHandler)
+        task.resume()
+        */
+        
         NSURLConnection.sendAsynchronousRequest(request,queue:queue,completionHandler:{response,data,error in
             
             if(error){
-             
+                
                 self.reverseGeocodingCompletionHandler!(address: nil,error: error.localizedDescription)
                 
             }else{
-               
+                
                 var dataAsString: NSString = NSString(data: data, encoding: NSUTF8StringEncoding)
                 
                 // Convert the retrieved data in to an object through JSON deserialization
                 var err: NSError
                 var jsonResult: NSDictionary = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: nil) as NSDictionary
-              
+                
                 var status = jsonResult.valueForKey("status") as NSString
                 if((status.lowercaseString as NSString).isEqualToString("ok")){
-                var address = AddressParser()
-                address.parseGoogleLocationData(jsonResult)
-                let addressDict = address.addressDictionary()
-                self.reverseGeocodingCompletionHandler!(address: addressDict,error: nil)
-                
+                    var address = AddressParser()
+                    address.parseGoogleLocationData(jsonResult)
+                    let addressDict = address.addressDictionary()
+                    self.reverseGeocodingCompletionHandler!(address: addressDict,error: nil)
+                    
                 }else{
-                
+                    
                     self.reverseGeocodingCompletionHandler!(address: nil,error: "invalid latitude: \(latitude) & longitude: \(longitude)")
-                
+                    
                 }
                 
             }
@@ -470,8 +480,40 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
             
             
         )
-
+        
+        
+    }
     
+    
+    
+    func apiHandler(data:NSData!, response:NSURLResponse!, error:NSError!) {
+        
+        if(error){
+            
+            self.reverseGeocodingCompletionHandler!(address: nil,error: error.localizedDescription)
+            
+        }else{
+            
+            var dataAsString: NSString = NSString(data: data, encoding: NSUTF8StringEncoding)
+            
+            // Convert the retrieved data in to an object through JSON deserialization
+            var err: NSError
+            var jsonResult: NSDictionary = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: nil) as NSDictionary
+            
+            var status = jsonResult.valueForKey("status") as NSString
+            if((status.lowercaseString as NSString).isEqualToString("ok")){
+                var address = AddressParser()
+                address.parseGoogleLocationData(jsonResult)
+                let addressDict = address.addressDictionary()
+                self.reverseGeocodingCompletionHandler!(address: addressDict,error: nil)
+                
+            }else{
+                
+                self.reverseGeocodingCompletionHandler!(address: nil,error: "invalid latitude: \(latitude) & longitude: \(longitude)")
+                
+            }
+            
+        }
     }
     
     

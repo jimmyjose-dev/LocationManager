@@ -8,10 +8,11 @@
 
 import UIKit
 import CoreLocation
+import MapKit
 
 
-typealias LMReverseGeocodeCompletionHandler = ((address:NSDictionary?, error:String?)->Void)?
-typealias LMGeocodeCompletionHandler = ((address:NSDictionary?, error:String?)->Void)?
+typealias LMReverseGeocodeCompletionHandler = ((addressInfo:NSDictionary?, error:String?)->Void)?
+typealias LMGeocodeCompletionHandler = ((gecodeInfo:NSDictionary?, error:String?)->Void)?
 typealias LMLocationCompletionHandler = ((latitude:Double, longitude:Double, status:String, verboseMessage:String, error:String?)->())?
 
 // Todo: Keep completion handler differerent for all services, otherwise only one will work
@@ -269,7 +270,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     }
     
     
-    func reverseGeocodeLocationWithLatLon(#latitude:Double, longitude: Double,onReverseGeocodingCompletionHandler:((address:NSDictionary?, error:String?)->Void)?){
+    func reverseGeocodeLocationWithLatLon(#latitude:Double, longitude: Double,onReverseGeocodingCompletionHandler:((addressInfo:NSDictionary?, error:String?)->Void)?){
         
         let location:CLLocation = CLLocation(latitude:latitude, longitude: longitude)
         
@@ -277,7 +278,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
     }
     
-    func reverseGeocodeLocationWithCoordinates(coord:CLLocation, onReverseGeocodingCompletionHandler:((address:NSDictionary?, error:String?)->Void)?){
+    func reverseGeocodeLocationWithCoordinates(coord:CLLocation, onReverseGeocodingCompletionHandler:((addressInfo:NSDictionary?, error:String?)->Void)?){
         
         self.reverseGeocodingCompletionHandler = onReverseGeocodingCompletionHandler
         
@@ -291,7 +292,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         geocoder.reverseGeocodeLocation(location, completionHandler: {(placemarks, error)->Void in
             
             if error {
-                self.reverseGeocodingCompletionHandler!(address:nil, error: error.localizedDescription)
+                self.reverseGeocodingCompletionHandler!(addressInfo:nil, error: error.localizedDescription)
                 
                 return
             }
@@ -300,10 +301,10 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                 var address = AddressParser()
                 address.parseAppleLocationData(placemark)
                 let addressDict = address.addressDictionary()
-                self.reverseGeocodingCompletionHandler!(address: addressDict,error: nil)
+                self.reverseGeocodingCompletionHandler!(addressInfo: addressDict,error: nil)
             }
             else {
-                self.reverseGeocodingCompletionHandler!(address: nil,error: "No Placemarks Found!")
+                self.reverseGeocodingCompletionHandler!(addressInfo: nil,error: "No Placemarks Found!")
                 return
             }
             
@@ -314,7 +315,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     
     
     
-    func geocodeAddressString(#address:NSString, onGeocodingCompletionHandler:((address:NSDictionary?, error:String?)->Void)?){
+    func geocodeAddressString(#address:NSString, onGeocodingCompletionHandler:((geocodeInfo:NSDictionary?, error:String?)->Void)?){
         
         self.geocodingCompletionHandler = onGeocodingCompletionHandler
         
@@ -332,7 +333,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
             
             if error {
                 
-                self.geocodingCompletionHandler!(address:nil, error: error.localizedDescription)
+                self.geocodingCompletionHandler!(gecodeInfo:nil,error: error.localizedDescription)
                 
                 return
             }
@@ -342,11 +343,11 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                 var address = AddressParser()
                 address.parseAppleLocationData(placemark)
                 let addressDict = address.addressDictionary()
-                self.geocodingCompletionHandler!(address: addressDict,error: nil)
+                self.geocodingCompletionHandler!(gecodeInfo: addressDict,error: nil)
             }
             else {
                 
-                self.geocodingCompletionHandler!(address: nil,error: "invalid address: \(address)")
+                self.geocodingCompletionHandler!(gecodeInfo: nil,error: "invalid address: \(address)")
                 return
             }
             
@@ -357,7 +358,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     }
     
     
-    func geocodeUsingGoogleAddressString(#address:NSString, onGeocodingCompletionHandler:((address:NSDictionary?, error:String?)->Void)?){
+    func geocodeUsingGoogleAddressString(#address:NSString, onGeocodingCompletionHandler:((geocodeInfo:NSDictionary?, error:String?)->Void)?){
         
         self.geocodingCompletionHandler = onGeocodingCompletionHandler
         
@@ -375,7 +376,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
     }
     
-    func reverseGeocodeLocationUsingGoogleWithLatLon(#latitude:Double, longitude: Double,onReverseGeocodingCompletionHandler:((address:NSDictionary?, error:String?)->Void)?){
+    func reverseGeocodeLocationUsingGoogleWithLatLon(#latitude:Double, longitude: Double,onReverseGeocodingCompletionHandler:((addressInfo:NSDictionary?, error:String?)->Void)?){
         
         self.reverseGeocodingCompletionHandler = onReverseGeocodingCompletionHandler
         
@@ -383,7 +384,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
     }
     
-    func reverseGeocodeLocationUsingGoogleWithCoordinates(coord:CLLocation, onReverseGeocodingCompletionHandler:((address:NSDictionary?, error:String?)->Void)?){
+    func reverseGeocodeLocationUsingGoogleWithCoordinates(coord:CLLocation, onReverseGeocodingCompletionHandler:((addressInfo:NSDictionary?, error:String?)->Void)?){
         
         reverseGeocodeLocationUsingGoogleWithLatLon(latitude: coord.coordinate.latitude, longitude: coord.coordinate.longitude, onReverseGeocodingCompletionHandler: onReverseGeocodingCompletionHandler)
         
@@ -413,11 +414,11 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                 
                 if(type == GeoCodingType.Geocoding){
                     
-                    self.geocodingCompletionHandler!(address: nil,error: error.localizedDescription)
+                    self.geocodingCompletionHandler!(gecodeInfo: nil,error: error.localizedDescription)
                     
                 }else{
                     
-                    self.reverseGeocodingCompletionHandler!(address: nil,error: error.localizedDescription)
+                    self.reverseGeocodingCompletionHandler!(addressInfo: nil,error: error.localizedDescription)
                     
                 }
             }else{
@@ -440,21 +441,28 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                     
                     if(type == GeoCodingType.Geocoding){
                         
-                        self.geocodingCompletionHandler!(address: addressDict,error: nil)
+                        var latitude = addressDict.valueForKey("latitude").doubleValue
+                        var longitude = addressDict.valueForKey("longitude").doubleValue
+                        
+                        var coord = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                        
+                        var placemark  = (MKPlacemark(coordinate: coord, addressDictionary: addressDict)) as CLPlacemark
+                        
+                        self.geocodingCompletionHandler!(gecodeInfo: addressDict,error: nil)
                         
                     }else{
                         
-                        self.reverseGeocodingCompletionHandler!(address: addressDict,error: nil)
+                        self.reverseGeocodingCompletionHandler!(addressInfo: addressDict,error: nil)
                     }
                     
                 }else{
                     if(type == GeoCodingType.Geocoding){
                         
-                        self.geocodingCompletionHandler!(address: nil,error: "invalid address")
+                        self.geocodingCompletionHandler!(gecodeInfo: nil,error: "invalid address")
                         
                     }else{
                         
-                        self.reverseGeocodingCompletionHandler!(address: nil,error: "invalid latitude")
+                        self.reverseGeocodingCompletionHandler!(addressInfo: nil,error: "invalid latitude")
                     }
                     
                 }
@@ -550,7 +558,7 @@ private class AddressParser: NSObject{
             let geometry = locationDict.objectForKey("geometry") as NSDictionary
             let location = geometry.objectForKey("location") as NSDictionary
             let lat = location.objectForKey("lat") as Double
-            let lng = location.objectForKey("lat") as Double
+            let lng = location.objectForKey("lng") as Double
             
             
             self.latitude = lat.description
@@ -562,15 +570,18 @@ private class AddressParser: NSObject{
             
             self.streetNumber = component("street_number", inArray: addressComponents, ofType: "long_name")
             
+            self.locality = component("locality", inArray: addressComponents, ofType: "long_name")
+            self.postalCode = component("postal_code", inArray: addressComponents, ofType: "short_name")
+            
             self.route = component("route", inArray: addressComponents, ofType: "long_name")
             
-            self.locality = component("locality", inArray: addressComponents, ofType: "long_name")
+            
             
             self.subLocality = component("subLocality", inArray: addressComponents, ofType: "long_name")
             
             self.administrativeArea = component("administrative_area_level_1", inArray: addressComponents, ofType: "long_name")
             
-            self.postalCode = component("postal_code", inArray: addressComponents, ofType: "short_name")
+            
             
             self.country =  component("country", inArray: addressComponents, ofType: "long_name")
             

@@ -22,22 +22,29 @@ Sample code
 **Location update**
 
     var locationManager = LocationManager.sharedInstance
-    locationManager.showVerboseMessage = true
-    locationManager.autoUpdate = false
-    locationManager.startUpdatingLocationWithCompletionHandler { (latitude, longitude, status, verboseMessage, error) -> () in
+            locationManager.showVerboseMessage = true
+            locationManager.autoUpdate = false
+            locationManager.startUpdatingLocationWithCompletionHandler { (latitude, longitude, status, verboseMessage, error) -> () in
                 
-        println("lat:\(latitude) lon:\(longitude) status:\(status) error:\(error)")
-        println(verboseMessage)
-    }
+                println("lat:\(latitude) lon:\(longitude) status:\(status) error:\(error)")
+                
+                println(verboseMessage)
+                
+            }
 
 **Geocoding using Apple service**
 
-    var locationManager = LocationManager.sharedInstance      
+ 
+
+    var locationManager = LocationManager.sharedInstance
+            
     locationManager.geocodeAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (geocodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
+                    
                     println(error)
                 }else{
+                    
                     println(geocodeInfo!)
                 }
             }
@@ -46,12 +53,14 @@ Sample code
 **Reverse Geocoding using Apple service**
 
     var locationManager = LocationManager.sharedInstance
-    locationManager.reverseGeocodeLocationWithLatLon(latitude: 37.331789, longitude: -122.029620) { (reverseGecodeInfo,placemark,error) -> Void in
+                locationManager.reverseGeocodeLocationWithLatLon(latitude: 37.331789, longitude: -122.029620) { (reverseGecodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
+                    
                     println(error)
                 }else{
-                	println(reverseGecodeInfo!)
+                    
+                    println(reverseGecodeInfo!)
                 }
                 
             }
@@ -59,12 +68,14 @@ Sample code
 **Geocoding using Google service**
 
     var locationManager = LocationManager.sharedInstance
-    locationManager.geocodeUsingGoogleAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (geocodeInfo,placemark,error) -> Void in
+       locationManager.geocodeUsingGoogleAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (geocodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
-                	println(error)
-                }else{	
-                	println(geocodeInfo!)
+                    
+                    println(error)
+                }else{
+                    
+                    println(geocodeInfo!)
                 }
                 
             }
@@ -73,12 +84,14 @@ Sample code
 **Reverse Geocoding using Google service**
 
     var locationManager = LocationManager.sharedInstance
-    locationManager.reverseGeocodeLocationUsingGoogleWithLatLon(latitude: 37.331789, longitude: -122.029620) { (reverseGecodeInfo,placemark,error) -> Void in
+          locationManager.reverseGeocodeLocationUsingGoogleWithLatLon(latitude: 37.331789, longitude: -122.029620) { (reverseGecodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
-                	println(error)
+                    
+                    println(error)
                 }else{
-                	println(reverseGecodeInfo!)
+                    
+                    println(reverseGecodeInfo!)
                 }
             }
 
@@ -158,3 +171,14 @@ Contact Us
 Have any questions or suggestions feel free to write at jimmy@varshyl.com (Jimmy Jose)
 http://www.varshylmobile.com/
 
+----------
+## License
+
+The MIT License (MIT)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

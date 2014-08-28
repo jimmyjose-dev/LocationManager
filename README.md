@@ -36,10 +36,8 @@ Sample code
     locationManager.geocodeAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (geocodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
-                    
                     println(error)
                 }else{
-                    
                     println(geocodeInfo!)
                 }
             }
@@ -51,11 +49,9 @@ Sample code
     locationManager.reverseGeocodeLocationWithLatLon(latitude: 37.331789, longitude: -122.029620) { (reverseGecodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
-                    
                     println(error)
                 }else{
-                    
-                    println(reverseGecodeInfo!)
+                	println(reverseGecodeInfo!)
                 }
                 
             }
@@ -66,11 +62,9 @@ Sample code
     locationManager.geocodeUsingGoogleAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (geocodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
-                    
-                    println(error)
-                }else{
-                    
-                    println(geocodeInfo!)
+                	println(error)
+                }else{	
+                	println(geocodeInfo!)
                 }
                 
             }
@@ -82,11 +76,9 @@ Sample code
     locationManager.reverseGeocodeLocationUsingGoogleWithLatLon(latitude: 37.331789, longitude: -122.029620) { (reverseGecodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
-                    
-                    println(error)
+                	println(error)
                 }else{
-                    
-                    println(reverseGecodeInfo!)
+                	println(reverseGecodeInfo!)
                 }
             }
 

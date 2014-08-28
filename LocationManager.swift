@@ -427,21 +427,20 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                 
                 let kStatus = "status"
                 let kOK = "ok"
-                let kZeroResults = "zero results"
-                let kAPILimit = "api limit"
+                let kZeroResults = "ZERO_RESULTS"
+                let kAPILimit = "OVER_QUERY_LIMIT"
+                let kRequestDenied = "REQUEST_DENIED"
+                let kInvalidRequest = "INVALID_REQUEST"
                 let kInvalidInput =  "Invalid Input"
                 
                 let dataAsString: NSString = NSString(data: data, encoding: NSUTF8StringEncoding)
+            
                 
-                var errorInJSON: NSError? = NSError()
-                
-                let jsonResult: NSDictionary = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: &errorInJSON) as NSDictionary
+                let jsonResult: NSDictionary = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: nil) as NSDictionary
                 
                 var status = jsonResult.valueForKey(kStatus) as NSString
                 status = status.lowercaseString
                 
-                if(errorInJSON == nil){
-                    
                     if(status.isEqualToString(kOK)){
                         
                         let address = AddressParser()
@@ -453,7 +452,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                         
                         self.setCompletionHandler(responseInfo:addressDict, placemark:placemark, error: nil, type:type)
                         
-                    }else if(!status.isEqualToString(kZeroResults) && !status.isEqualToString(kAPILimit)){
+                    }else if(!status.isEqualToString(kZeroResults) && !status.isEqualToString(kAPILimit) && !status.isEqualToString(kRequestDenied) && !status.isEqualToString(kInvalidRequest)){
                         
                         self.setCompletionHandler(responseInfo:nil, placemark:nil, error:kInvalidInput, type:type)
                         
@@ -461,14 +460,10 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                         
                     else{
                      
+                        //status = (status.componentsSeparatedByString("_") as NSArray).componentsJoinedByString(" ").capitalizedString
                         self.setCompletionHandler(responseInfo:nil, placemark:nil, error:status, type:type)
                         
                     }
-                    
-                }else{
-                    
-                    self.setCompletionHandler(responseInfo:nil, placemark:nil, error:errorInJSON?.localizedDescription, type:type)
-                }
                 
             }
             

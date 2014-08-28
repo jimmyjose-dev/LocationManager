@@ -192,9 +192,6 @@ class ViewController: UIViewController ,LocationManagerDelegate,UITextFieldDeleg
         
         self.mapView?.addAnnotation(MKPlacemark(placemark: placemark))
         
-        
-        
     }
-    
     
 }

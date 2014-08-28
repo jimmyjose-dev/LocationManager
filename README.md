@@ -1,7 +1,7 @@
 LocationManager
 =====================
 
-CLLocationManager wrapper in Swift
+Location manager is a CLLocationManager wrapper written entirely in Swift
 ----------------------------------
 **Features:**
 >  1) Location update with closure & delegate support 
@@ -9,6 +9,8 @@ CLLocationManager wrapper in Swift
 >  2) Geocoding and reverse geocoding using Apple service 
 >  
 >  3) Geocoding and reverse geocoding using Google service
+>
+> 4) Closure returns CLPlacemark object, making it easier to place pin on map
 
 
 
@@ -20,30 +22,25 @@ Sample code
 **Location update**
 
     var locationManager = LocationManager.sharedInstance
-            locationManager.showVerboseMessage = true
-            locationManager.autoUpdate = false
-            locationManager.startUpdatingLocationWithCompletionHandler { (latitude, longitude, status, verboseMessage, error) -> () in
+    locationManager.showVerboseMessage = true
+    locationManager.autoUpdate = false
+    locationManager.startUpdatingLocationWithCompletionHandler { (latitude, longitude, status, verboseMessage, error) -> () in
                 
-                println("lat:\(latitude) lon:\(longitude) status:\(status) error:\(error)")
-                
-                println(verboseMessage)
-                
-            }
+        println("lat:\(latitude) lon:\(longitude) status:\(status) error:\(error)")
+        println(verboseMessage)
+    }
 
 **Geocoding using Apple service**
 
- 
-
-    var locationManager = LocationManager.sharedInstance
-            
-    locationManager.geocodeAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (address, error) -> Void in
+    var locationManager = LocationManager.sharedInstance      
+    locationManager.geocodeAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (geocodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
                     
                     println(error)
                 }else{
                     
-                    println(address!)
+                    println(geocodeInfo!)
                 }
             }
             
@@ -51,14 +48,14 @@ Sample code
 **Reverse Geocoding using Apple service**
 
     var locationManager = LocationManager.sharedInstance
-                locationManager.reverseGeocodeLocationWithLatLon(latitude: 37.331789, longitude: -122.029620) { (address, error) -> Void in
+    locationManager.reverseGeocodeLocationWithLatLon(latitude: 37.331789, longitude: -122.029620) { (reverseGecodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
                     
                     println(error)
                 }else{
                     
-                    println(address!)
+                    println(reverseGecodeInfo!)
                 }
                 
             }
@@ -66,14 +63,14 @@ Sample code
 **Geocoding using Google service**
 
     var locationManager = LocationManager.sharedInstance
-       locationManager.geocodeUsingGoogleAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (address, error) -> Void in
+    locationManager.geocodeUsingGoogleAddressString(address: "Apple Inc., Infinite Loop, Cupertino, CA  95014, United States") { (geocodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
                     
                     println(error)
                 }else{
                     
-                    println(address!)
+                    println(geocodeInfo!)
                 }
                 
             }
@@ -82,14 +79,14 @@ Sample code
 **Reverse Geocoding using Google service**
 
     var locationManager = LocationManager.sharedInstance
-          locationManager.reverseGeocodeLocationUsingGoogleWithLatLon(latitude: 37.331789, longitude: -122.029620) { (address, error) -> Void in
+    locationManager.reverseGeocodeLocationUsingGoogleWithLatLon(latitude: 37.331789, longitude: -122.029620) { (reverseGecodeInfo,placemark,error) -> Void in
                 
                 if(error != nil){
                     
                     println(error)
                 }else{
                     
-                    println(address!)
+                    println(reverseGecodeInfo!)
                 }
             }
 
@@ -127,14 +124,11 @@ Sample code
     }
     
     func locationFoundGetAsString(latitude: NSString, longitude: NSString) {
-        
-        println(latitude)
-        println(longitude)
+       
     }
     
     
     func locationFound(latitude:Double, longitude:Double){
-        
         
     }
 

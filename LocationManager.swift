@@ -11,7 +11,6 @@ import CoreLocation
 import MapKit
 
 
-
 typealias LMReverseGeocodeCompletionHandler = ((reverseGecodeInfo:NSDictionary?,placemark:CLPlacemark?, error:String?)->Void)?
 typealias LMGeocodeCompletionHandler = ((gecodeInfo:NSDictionary?,placemark:CLPlacemark?, error:String?)->Void)?
 typealias LMLocationCompletionHandler = ((latitude:Double, longitude:Double, status:String, verboseMessage:String, error:String?)->())?
@@ -590,8 +589,6 @@ private class AddressParser: NSObject{
             
         }
         else{
-            
-            
             
         }
         

@@ -142,8 +142,17 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         // locationManager.locationServicesEnabled
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         
-        //check for iOS8 thingy in next update
-        //locationManager.requestAlwaysAuthorization()
+        let Device = UIDevice.currentDevice()
+        
+        let iosVersion = NSString(string: Device.systemVersion).doubleValue
+        
+        let iOS8 = iosVersion >= 8
+        
+        if iOS8{
+            
+            //locationManager.requestAlwaysAuthorization() // add in plist NSLocationAlwaysUsageDescription
+            locationManager.requestWhenInUseAuthorization() // add in plist NSLocationWhenInUseUsageDescription
+        }
         
         if(autoUpdate){
             
@@ -331,7 +340,6 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         let geocoder = CLGeocoder()
         geocoder.geocodeAddressString(address, {(placemarks: [AnyObject]!, error: NSError!) -> Void in
             
-            
             if (error != nil) {
                 
                 self.geocodingCompletionHandler!(gecodeInfo:nil,placemark:nil,error: error.localizedDescription)
@@ -417,32 +425,53 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                 
             }else{
                 
+                let kStatus = "status"
+                let kOK = "ok"
+                let kZeroResults = "zero results"
+                let kAPILimit = "api limit"
+                let kInvalidInput =  "Invalid Input"
+                
                 let dataAsString: NSString = NSString(data: data, encoding: NSUTF8StringEncoding)
                 
-                var err: NSError
+                var errorInJSON: NSError? = NSError()
                 
-                let jsonResult: NSDictionary = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: nil) as NSDictionary
+                let jsonResult: NSDictionary = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: &errorInJSON) as NSDictionary
                 
-                var status = jsonResult.valueForKey("status") as NSString
+                var status = jsonResult.valueForKey(kStatus) as NSString
+                status = status.lowercaseString
                 
-                if((status.lowercaseString as NSString).isEqualToString("ok")){
+                if(errorInJSON == nil){
                     
-                    let address = AddressParser()
-                    
-                    address.parseGoogleLocationData(jsonResult)
-                    
-                    let addressDict = address.getAddressDictionary()
-                    let placemark:CLPlacemark = address.getPlacemark()
-                    
-                    self.setCompletionHandler(responseInfo:addressDict, placemark:placemark, error: nil, type:type)
+                    if(status.isEqualToString(kOK)){
+                        
+                        let address = AddressParser()
+                        
+                        address.parseGoogleLocationData(jsonResult)
+                        
+                        let addressDict = address.getAddressDictionary()
+                        let placemark:CLPlacemark = address.getPlacemark()
+                        
+                        self.setCompletionHandler(responseInfo:addressDict, placemark:placemark, error: nil, type:type)
+                        
+                    }else if(!status.isEqualToString(kZeroResults) && !status.isEqualToString(kAPILimit)){
+                        
+                        self.setCompletionHandler(responseInfo:nil, placemark:nil, error:kInvalidInput, type:type)
+                        
+                    }
+                        
+                    else{
+                     
+                        self.setCompletionHandler(responseInfo:nil, placemark:nil, error:status, type:type)
+                        
+                    }
                     
                 }else{
                     
-                    self.setCompletionHandler(responseInfo:nil, placemark:nil, error:"invalid input", type:type)
-                    
+                    self.setCompletionHandler(responseInfo:nil, placemark:nil, error:errorInJSON?.localizedDescription, type:type)
                 }
                 
             }
+            
             }
         )
         
@@ -497,7 +526,7 @@ private class AddressParser: NSObject{
         
     }
     
-    func getAddressDictionary()-> NSDictionary{
+    private func getAddressDictionary()-> NSDictionary{
         
         var addressDict = NSMutableDictionary()
         
@@ -518,7 +547,6 @@ private class AddressParser: NSObject{
     private func parseAppleLocationData(placemark:CLPlacemark){
         
         var addressLines = placemark.addressDictionary["FormattedAddressLines"] as NSArray
-        
         
         //self.streetNumber = placemark.subThoroughfare ? placemark.subThoroughfare : ""
         self.streetNumber = placemark.thoroughfare != nil ? placemark.thoroughfare : ""
@@ -541,56 +569,33 @@ private class AddressParser: NSObject{
     
     private func parseGoogleLocationData(resultDict:NSDictionary){
         
+        let locationDict = (resultDict.valueForKey("results") as NSArray).firstObject as NSDictionary
         
-        var status = resultDict.valueForKey("status") as NSString
+        let formattedAddrs = locationDict.objectForKey("formatted_address") as NSString
         
-        if((status.lowercaseString as NSString).isEqualToString("ok")){
-            
-            let locationDict = (resultDict.valueForKey("results") as NSArray).firstObject as NSDictionary
-            
-            let formattedAddrs = locationDict.objectForKey("formatted_address") as NSString
-            
-            let geometry = locationDict.objectForKey("geometry") as NSDictionary
-            let location = geometry.objectForKey("location") as NSDictionary
-            let lat = location.objectForKey("lat") as Double
-            let lng = location.objectForKey("lng") as Double
-            
-            
-            self.latitude = lat.description
-            self.longitude = lng.description
-            
-            let addressComponents = locationDict.objectForKey("address_components") as NSArray
-            
-            
-            self.subThoroughfare = component("street_number", inArray: addressComponents, ofType: "long_name")
-            self.thoroughfare = component("route", inArray: addressComponents, ofType: "long_name")
-            
-            self.streetNumber = self.subThoroughfare
-            
-            self.locality = component("locality", inArray: addressComponents, ofType: "long_name")
-            self.postalCode = component("postal_code", inArray: addressComponents, ofType: "long_name")
-            
-            self.route = component("route", inArray: addressComponents, ofType: "long_name")
-            
-            self.subLocality = component("subLocality", inArray: addressComponents, ofType: "long_name")
-            
-            self.administrativeArea = component("administrative_area_level_1", inArray: addressComponents, ofType: "long_name")
-            
-            self.administrativeAreaCode = component("administrative_area_level_1", inArray: addressComponents, ofType: "short_name")
-            
-            
-            self.subAdministrativeArea = component("administrative_area_level_2", inArray: addressComponents, ofType: "long_name")
-            
-            
-            self.country =  component("country", inArray: addressComponents, ofType: "long_name")
-            self.ISOcountryCode =  component("country", inArray: addressComponents, ofType: "short_name")
-            
-            self.formattedAddress = formattedAddrs;
-            
-        }
-        else{
-            
-        }
+        let geometry = locationDict.objectForKey("geometry") as NSDictionary
+        let location = geometry.objectForKey("location") as NSDictionary
+        let lat = location.objectForKey("lat") as Double
+        let lng = location.objectForKey("lng") as Double
+        
+        self.latitude = lat.description
+        self.longitude = lng.description
+        
+        let addressComponents = locationDict.objectForKey("address_components") as NSArray
+        
+        self.subThoroughfare = component("street_number", inArray: addressComponents, ofType: "long_name")
+        self.thoroughfare = component("route", inArray: addressComponents, ofType: "long_name")
+        self.streetNumber = self.subThoroughfare
+        self.locality = component("locality", inArray: addressComponents, ofType: "long_name")
+        self.postalCode = component("postal_code", inArray: addressComponents, ofType: "long_name")
+        self.route = component("route", inArray: addressComponents, ofType: "long_name")
+        self.subLocality = component("subLocality", inArray: addressComponents, ofType: "long_name")
+        self.administrativeArea = component("administrative_area_level_1", inArray: addressComponents, ofType: "long_name")
+        self.administrativeAreaCode = component("administrative_area_level_1", inArray: addressComponents, ofType: "short_name")
+        self.subAdministrativeArea = component("administrative_area_level_2", inArray: addressComponents, ofType: "long_name")
+        self.country =  component("country", inArray: addressComponents, ofType: "long_name")
+        self.ISOcountryCode =  component("country", inArray: addressComponents, ofType: "short_name")
+        self.formattedAddress = formattedAddrs;
         
     }
     

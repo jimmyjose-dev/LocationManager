@@ -175,9 +175,11 @@ class ViewController: UIViewController ,LocationManagerDelegate,UITextFieldDeleg
     
     func plotPlacemarkOnMap(placemark:CLPlacemark?){
         
-        locationManager.stopUpdatingLocation()
-        activityIndicator.removeFromSuperview()
-        activityIndicator.stopAnimating()
+        if (self.locationManager.isRunning){
+            self.locationManager.stopUpdatingLocation()
+            self.activityIndicator.removeFromSuperview()
+            self.activityIndicator.stopAnimating()
+        }
         
         var latDelta:CLLocationDegrees = 0.1
         var longDelta:CLLocationDegrees = 0.1
@@ -190,6 +192,7 @@ class ViewController: UIViewController ,LocationManagerDelegate,UITextFieldDeleg
         self.mapView?.setRegion(theRegion, animated: true)
         
         self.mapView?.addAnnotation(MKPlacemark(placemark: placemark))
+        
         
     }
     

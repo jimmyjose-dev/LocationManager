@@ -63,6 +63,8 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     
     var showVerboseMessage = false
     
+    var isRunning = false
+    
     
     class var sharedInstance : LocationManager {
     struct Static {
@@ -154,6 +156,13 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
             locationManager.requestWhenInUseAuthorization() // add in plist NSLocationWhenInUseUsageDescription
         }
         
+        startLocationManger()
+        
+        
+    }
+    
+    private func startLocationManger(){
+    
         if(autoUpdate){
             
             locationManager.startUpdatingLocation()
@@ -162,14 +171,31 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
             locationManager.startMonitoringSignificantLocationChanges()
         }
         
+        isRunning = true
         
+    }
+    
+    
+    private func stopLocationManger(){
+        
+        if(autoUpdate){
+            
+            locationManager.stopUpdatingLocation()
+        }else{
+            
+            locationManager.stopMonitoringSignificantLocationChanges()
+        }
+        
+        isRunning = false
     }
     
     
     internal func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
         
-        locationManager.stopUpdatingLocation()
+        stopLocationManger()
+        
         resetLatLon()
+        
         if(!keepLastKnownLocation){
             
             resetLastKnownLatLon()
@@ -243,13 +269,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
             verboseMessage = verboseMessageDictionary[verboseKey]!
             
             if (hasAuthorised == true) {
-                if(autoUpdate){
-                    
-                    locationManager.startUpdatingLocation()
-                }else{
-                    
-                    locationManager.startMonitoringSignificantLocationChanges()
-                }
+                startLocationManger()
             }else{
                 
                 resetLatLon()

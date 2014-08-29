@@ -35,7 +35,6 @@ class ViewController: UIViewController ,LocationManagerDelegate,UITextFieldDeleg
         activityIndicator.color = UIColor.blueColor()
         //activityIndicator.backgroundColor = UIColor.brownColor()
         
-        
         locationManager.autoUpdate = true
         
         var address = "1 Infinite Loop, CA, USA"

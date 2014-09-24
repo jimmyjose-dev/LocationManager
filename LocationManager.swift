@@ -317,7 +317,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     }
     
     
-    func reverseGeocodeLocationWithLatLon(#latitude:Double, longitude: Double,onReverseGeocodingCompletionHandler:((reverseGeocodeInfo:NSDictionary?,placemark:CLPlacemark?, error:String?)->Void)?){
+    func reverseGeocodeLocationWithLatLon(#latitude:Double, longitude: Double,onReverseGeocodingCompletionHandler:LMReverseGeocodeCompletionHandler){
         
         let location:CLLocation = CLLocation(latitude:latitude, longitude: longitude)
         
@@ -325,7 +325,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
     }
     
-    func reverseGeocodeLocationWithCoordinates(coord:CLLocation, onReverseGeocodingCompletionHandler:((reverseGeocodeInfo:NSDictionary?,placemark:CLPlacemark?, error:String?)->Void)?){
+    func reverseGeocodeLocationWithCoordinates(coord:CLLocation, onReverseGeocodingCompletionHandler:LMReverseGeocodeCompletionHandler){
         
         self.reverseGeocodingCompletionHandler = onReverseGeocodingCompletionHandler
         
@@ -363,7 +363,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     
     
     
-    func geocodeAddressString(#address:NSString, onGeocodingCompletionHandler:((geocodeInfo:NSDictionary?,placemark:CLPlacemark?, error:String?)->Void)?){
+    func geocodeAddressString(#address:NSString, onGeocodingCompletionHandler:LMGeocodeCompletionHandler){
         
         self.geocodingCompletionHandler = onGeocodingCompletionHandler
         
@@ -405,7 +405,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     }
     
     
-    func geocodeUsingGoogleAddressString(#address:NSString, onGeocodingCompletionHandler:((geocodeInfo:NSDictionary?,placemark:CLPlacemark?, error:String?)->Void)?){
+    func geocodeUsingGoogleAddressString(#address:NSString, onGeocodingCompletionHandler:LMGeocodeCompletionHandler){
         
         self.geocodingCompletionHandler = onGeocodingCompletionHandler
         
@@ -423,7 +423,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
     }
     
-    func reverseGeocodeLocationUsingGoogleWithLatLon(#latitude:Double, longitude: Double,onReverseGeocodingCompletionHandler:((reverseGeocodeInfo:NSDictionary?,placemark:CLPlacemark?, error:String?)->Void)?){
+    func reverseGeocodeLocationUsingGoogleWithLatLon(#latitude:Double, longitude: Double,onReverseGeocodingCompletionHandler:LMReverseGeocodeCompletionHandler){
         
         self.reverseGeocodingCompletionHandler = onReverseGeocodingCompletionHandler
         
@@ -431,7 +431,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
     }
     
-    func reverseGeocodeLocationUsingGoogleWithCoordinates(coord:CLLocation, onReverseGeocodingCompletionHandler:((reverseGeocodeInfo:NSDictionary?,placemark:CLPlacemark?, error:String?)->Void)?){
+    func reverseGeocodeLocationUsingGoogleWithCoordinates(coord:CLLocation, onReverseGeocodingCompletionHandler:LMReverseGeocodeCompletionHandler){
         
         reverseGeocodeLocationUsingGoogleWithLatLon(latitude: coord.coordinate.latitude, longitude: coord.coordinate.longitude, onReverseGeocodingCompletionHandler: onReverseGeocodingCompletionHandler)
         

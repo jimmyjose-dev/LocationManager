@@ -13,6 +13,16 @@ Location manager is a CLLocationManager wrapper written entirely in Swift
 > 4) Closure returns CLPlacemark object, making it easier to place pin on map
 
 
+----------
+
+
+**Try this too:**
+https://github.com/varshylmobile/MapManager
+
+
+----------
+
+
 Screenshot
 ==========
 

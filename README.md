@@ -180,6 +180,35 @@ Roadmap
  - iPhone4 and startMonitoringSignificantLocationChanges issue
 
 ----------
+
+Contributors 
+---------------
+***All contributors will receive virtual high fives from me and for the heck of it lets forget you are a south paw***
+![enter image description here](https://dl.dropbox.com/s/n32dq4fle8fh7l4/internet-high-five.jpg)
+
+
+----------
+Other Repos you might like
+--------------------------
+
+1) https://github.com/varshylmobile/MapManager
+
+> Map manager is a MapKit wrapper in Swift to provide route direction
+> drawing
+
+2) https://github.com/varshylmobile/VMXMLParser
+
+> NSXMLParser wrapper in Swift
+
+3) https://github.com/varshylmobile/RateMyApp
+
+> RateMyApp is a Swift class to provide gentle reminders to app user to
+> rate your app
+
+4) https://github.com/varshylmobile/TableViewCellFlip
+
+> Vertical and Horizontal flip animation for table view cell
+
 Contact Us
 ---------------
 

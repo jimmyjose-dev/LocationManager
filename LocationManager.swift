@@ -449,9 +449,9 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     
     private func performOperationForURL(urlString:NSString,type:GeoCodingType){
         
-        let url:NSURL = NSURL(string:urlString)
+        let url:NSURL? = NSURL(string:urlString)
         
-        let request:NSURLRequest = NSURLRequest(URL:url)
+        let request:NSURLRequest = NSURLRequest(URL:url!)
         
         let queue:NSOperationQueue = NSOperationQueue()
         
@@ -471,7 +471,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                 let kInvalidRequest = "INVALID_REQUEST"
                 let kInvalidInput =  "Invalid Input"
                 
-                let dataAsString: NSString = NSString(data: data, encoding: NSUTF8StringEncoding)
+                let dataAsString: NSString? = NSString(data: data, encoding: NSUTF8StringEncoding)
             
                 
                 let jsonResult: NSDictionary = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: nil) as NSDictionary

@@ -46,7 +46,6 @@ class ViewController: UIViewController ,LocationManagerDelegate,UITextFieldDeleg
     
     @IBAction func reverseGeocode(sender:UIButton){
         
-        
         activityIndicator.startAnimating()
         view.addSubview(activityIndicator)
         
@@ -125,15 +124,7 @@ class ViewController: UIViewController ,LocationManagerDelegate,UITextFieldDeleg
         
         locationManager.geocodeUsingGoogleAddressString(address: address) { (geocodeInfo,placemark, error) -> Void in
             
-            if(error != nil){
-                
-                println(error)
-                self.activityIndicator.stopAnimating()
-            }else{
-                
-                self.plotPlacemarkOnMap(placemark)
-                
-            }
+            self.performActionWithPlacemark(placemark, error: error)
         }
     }
     
@@ -142,16 +133,7 @@ class ViewController: UIViewController ,LocationManagerDelegate,UITextFieldDeleg
         
         locationManager.geocodeAddressString(address: address) { (geocodeInfo,placemark, error) -> Void in
             
-            if(error != nil){
-                
-                println(error)
-                self.activityIndicator.stopAnimating()
-            }else{
-                
-                self.plotPlacemarkOnMap(placemark)
-                
-            }
-        }
+            self.performActionWithPlacemark(placemark, error: error)        }
     }
     
     
@@ -160,25 +142,72 @@ class ViewController: UIViewController ,LocationManagerDelegate,UITextFieldDeleg
         
         locationManager.reverseGeocodeLocationUsingGoogleWithLatLon(latitude: latitude, longitude: longitude) { (reverseGeocodeInfo, placemark, error) -> Void in
             
-            if(error != nil){
-                
-                println(error)
-                self.activityIndicator.stopAnimating()
-            }else{
-                
-                self.plotPlacemarkOnMap(placemark)
-            }
-            
+            self.performActionWithPlacemark(placemark, error: error)
         }
         
     }
     
+    
+    func performActionWithPlacemark(placemark:CLPlacemark?,error:String?){
+        
+        if(error != nil){
+            
+            println(error)
+            
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                
+                if self.activityIndicator.superview != nil {
+                    
+                    self.activityIndicator.stopAnimating()
+                    self.activityIndicator.removeFromSuperview()
+                    
+                }
+            })
+            
+            
+        }else{
+            
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                self.plotPlacemarkOnMap(placemark)
+            })
+            
+        }
+        
+        
+    }
+    
+    func removeAllPlacemarkFromMap(#shouldRemoveUserLocation:Bool){
+        
+        if let mapView = self.mapView {
+            for annotation in mapView.annotations{
+                if shouldRemoveUserLocation {
+                    if annotation as? MKUserLocation !=  mapView.userLocation {
+                        mapView.removeAnnotation(annotation as MKAnnotation)
+                    }
+                }
+                
+                
+            }
+            
+        }
+        
+        
+    }
+    
+    
     func plotPlacemarkOnMap(placemark:CLPlacemark?){
+        
+        removeAllPlacemarkFromMap(shouldRemoveUserLocation:true)
         
         if (self.locationManager.isRunning){
             self.locationManager.stopUpdatingLocation()
-            self.activityIndicator.removeFromSuperview()
+        }
+        
+        if self.activityIndicator.superview != nil {
+            
             self.activityIndicator.stopAnimating()
+            self.activityIndicator.removeFromSuperview()
+            
         }
         
         var latDelta:CLLocationDegrees = 0.1
@@ -188,7 +217,7 @@ class ViewController: UIViewController ,LocationManagerDelegate,UITextFieldDeleg
         var latitudinalMeters = 100.0
         var longitudinalMeters = 100.0
         var theRegion:MKCoordinateRegion = MKCoordinateRegionMakeWithDistance(placemark!.location.coordinate, latitudinalMeters, longitudinalMeters)
-        self.mapView?.region = theRegion
+        
         self.mapView?.setRegion(theRegion, animated: true)
         
         self.mapView?.addAnnotation(MKPlacemark(placemark: placemark))

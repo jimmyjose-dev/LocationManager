@@ -4,7 +4,7 @@ LocationManager
 Location manager is a CLLocationManager wrapper written entirely in Swift
 ----------------------------------
 
-**Updated for XCode 6.1 and iOS 8.1.1**
+**Updated for XCode 6.2 beta 3 and iOS 8.2 beta**
 
 **Features:**
 >  1) Location update with closure & delegate support 

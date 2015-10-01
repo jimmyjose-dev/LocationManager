@@ -415,7 +415,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     
     private func geoCodeUsignGoogleAddress(address:NSString){
         
-        var urlString = "http://maps.googleapis.com/maps/api/geocode/json?address=\(address)&sensor=true" as NSString
+        var urlString = "https://maps.googleapis.com/maps/api/geocode/json?address=\(address)&sensor=true" as NSString
         
         urlString = urlString.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
         
@@ -439,7 +439,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     
     private func reverseGocodeUsingGoogle(latitude latitude:Double, longitude: Double){
         
-        var urlString = "http://maps.googleapis.com/maps/api/geocode/json?latlng=\(latitude),\(longitude)&sensor=true" as NSString
+        var urlString = "https://maps.googleapis.com/maps/api/geocode/json?latlng=\(latitude),\(longitude)&sensor=true" as NSString
         
         urlString = urlString.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
         

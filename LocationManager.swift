@@ -224,7 +224,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         if showVerboseMessage {verbose = verboseMessage}
         completionHandler?(latitude: 0.0, longitude: 0.0, status: locationStatus as String, verboseMessage:verbose,error: error.localizedDescription)
         
-        if ((delegate != nil) && (delegate?.respondsToSelector(Selector("locationManagerReceivedError:")))!){
+        if ((delegate != nil) && (delegate?.respondsToSelector(#selector(LocationManagerDelegate.locationManagerReceivedError(_:))))!){
             delegate?.locationManagerReceivedError!(error.localizedDescription)
         }
     }
@@ -259,10 +259,10 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         hasLastKnownLocation = true
         
         if (delegate != nil){
-            if((delegate?.respondsToSelector(Selector("locationFoundGetAsString:longitude:")))!){
+            if((delegate?.respondsToSelector(#selector(LocationManagerDelegate.locationFoundGetAsString(_:longitude:))))!){
                 delegate?.locationFoundGetAsString!(latitudeAsString,longitude:longitudeAsString)
             }
-            if((delegate?.respondsToSelector(Selector("locationFound:longitude:")))!){
+            if((delegate?.respondsToSelector(#selector(LocationManagerDelegate.locationFound(_:longitude:))))!){
                 delegate?.locationFound(latitude,longitude:longitude)
             }
         }
@@ -299,7 +299,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                         
                         verbose = verboseMessage
                         
-                        if ((delegate != nil) && (delegate?.respondsToSelector(Selector("locationManagerVerboseMessage:")))!){
+                        if ((delegate != nil) && (delegate?.respondsToSelector(#selector(LocationManagerDelegate.locationManagerVerboseMessage(_:))))!){
                             
                             delegate?.locationManagerVerboseMessage!(verbose)
                             
@@ -310,7 +310,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                         completionHandler?(latitude: latitude, longitude: longitude, status: locationStatus as String, verboseMessage:verbose,error: nil)
                     }
                 }
-                if ((delegate != nil) && (delegate?.respondsToSelector(Selector("locationManagerStatus:")))!){
+                if ((delegate != nil) && (delegate?.respondsToSelector(#selector(LocationManagerDelegate.locationManagerStatus(_:))))!){
                     delegate?.locationManagerStatus!(locationStatus)
                 }
             }
@@ -417,7 +417,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
         var urlString = "http://maps.googleapis.com/maps/api/geocode/json?address=\(address)&sensor=true" as NSString
         
-        urlString = urlString.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+        urlString = urlString.stringByAddingPercentEncodingWithAllowedCharacters(.URLQueryAllowedCharacterSet())!
         
         performOperationForURL(urlString, type: GeoCodingType.Geocoding)
         
@@ -441,7 +441,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
         var urlString = "http://maps.googleapis.com/maps/api/geocode/json?latlng=\(latitude),\(longitude)&sensor=true" as NSString
         
-        urlString = urlString.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+        urlString = urlString.stringByAddingPercentEncodingWithAllowedCharacters(.URLQueryAllowedCharacterSet())!
         
         performOperationForURL(urlString, type: GeoCodingType.ReverseGeocoding)
         
@@ -453,9 +453,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
         let request:NSURLRequest = NSURLRequest(URL:url!)
         
-        let queue:NSOperationQueue = NSOperationQueue()
-        
-        NSURLConnection.sendAsynchronousRequest(request,queue:queue,completionHandler:{response,data,error in
+        let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { (data, response, error) in
             
             if(error != nil){
                 
@@ -505,8 +503,9 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
                 
             }
             
-            }
-        )
+        }
+        
+        task.resume()
         
     }
     

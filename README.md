@@ -25,6 +25,32 @@ https://github.com/varshylmobile/MapManager
 
 ----------
 
+## Installation with CocoaPods
+
+[CocoaPods](http://cocoapods.org) is a dependency manager for Objective-C, which automates and simplifies the process of using 3rd-party libraries.
+You can install it with the following command:
+
+```bash
+$ gem install cocoapods
+```
+#### Podfile
+
+To integrate VMLocationManager into your Xcode project using CocoaPods, specify it in your `Podfile`:
+
+```ruby
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '8.0'
+
+target 'TargetName' do
+pod 'VMLocationManager', '~> 1.0.0'
+end
+```
+
+Then, run the following command:
+
+```bash
+$ pod install
+```
 
 Screenshot
 ==========

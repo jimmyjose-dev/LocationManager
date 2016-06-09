@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
-    s.name             = "LocationManager"
+    s.name             = "VMLocationManager"
     s.version          = "1.0.0"
-    s.summary          = "LocationManager"
+    s.summary          = "LocationManager is a CLLocationManager wrapper written entirely in Swift"
     s.homepage         = "https://github.com/varshylmobile/LocationManager"
     s.license          = 'MIT'
     s.author           = { "Jimmy Jose" => "jimmy@varshyl.com" }

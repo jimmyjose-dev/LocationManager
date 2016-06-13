@@ -40,7 +40,7 @@ enum GeoCodingType{
     case ReverseGeocoding
 }
 
-class LocationManager: NSObject,CLLocationManagerDelegate {
+public class LocationManager: NSObject,CLLocationManagerDelegate {
     
     /* Private variables */
     private var completionHandler:LMLocationCompletionHandler
@@ -53,13 +53,13 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     private var verboseMessage = "Calibrating"
     
     private let verboseMessageDictionary = [CLAuthorizationStatus.NotDetermined:"You have not yet made a choice with regards to this application.",
-        CLAuthorizationStatus.Restricted:"This application is not authorized to use location services. Due to active restrictions on location services, the user cannot change this status, and may not have personally denied authorization.",
-        CLAuthorizationStatus.Denied:"You have explicitly denied authorization for this application, or location services are disabled in Settings.",
-        CLAuthorizationStatus.AuthorizedAlways:"App is Authorized to use location services.",
-        CLAuthorizationStatus.AuthorizedWhenInUse:"You have granted authorization to use your location only when the app is visible to you."]
+                                            CLAuthorizationStatus.Restricted:"This application is not authorized to use location services. Due to active restrictions on location services, the user cannot change this status, and may not have personally denied authorization.",
+                                            CLAuthorizationStatus.Denied:"You have explicitly denied authorization for this application, or location services are disabled in Settings.",
+                                            CLAuthorizationStatus.AuthorizedAlways:"App is Authorized to use location services.",
+                                            CLAuthorizationStatus.AuthorizedWhenInUse:"You have granted authorization to use your location only when the app is visible to you."]
     
     
-    var delegate:LocationManagerDelegate? = nil
+    public var delegate:LocationManagerDelegate? = nil
     
     var latitude:Double = 0.0
     var longitude:Double = 0.0
@@ -85,7 +85,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     var isRunning = false
     
     
-    class var sharedInstance : LocationManager {
+    public class var sharedInstance : LocationManager {
         struct Static {
             static let instance : LocationManager = LocationManager()
         }
@@ -125,7 +125,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
     }
     
-    func startUpdatingLocationWithCompletionHandler(completionHandler:((latitude:Double, longitude:Double, status:String, verboseMessage:String, error:String?)->())? = nil){
+    public func startUpdatingLocationWithCompletionHandler(completionHandler:((latitude:Double, longitude:Double, status:String, verboseMessage:String, error:String?)->())? = nil){
         
         self.completionHandler = completionHandler
         
@@ -133,12 +133,12 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     }
     
     
-    func startUpdatingLocation(){
+    public func startUpdatingLocation(){
         
         initLocationManager()
     }
     
-    func stopUpdatingLocation(){
+    public func stopUpdatingLocation(){
         
         if(autoUpdate){
             locationManager.stopUpdatingLocation()
@@ -209,7 +209,7 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     }
     
     
-    internal func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
+    public func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         
         stopLocationManger()
         
@@ -224,12 +224,10 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         if showVerboseMessage {verbose = verboseMessage}
         completionHandler?(latitude: 0.0, longitude: 0.0, status: locationStatus as String, verboseMessage:verbose,error: error.localizedDescription)
         
-        if ((delegate != nil) && (delegate?.respondsToSelector(#selector(LocationManagerDelegate.locationManagerReceivedError(_:))))!){
-            delegate?.locationManagerReceivedError!(error.localizedDescription)
-        }
+        delegate?.locationManagerReceivedError(error.localizedDescription)
     }
     
-    internal func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         let arrayOfLocation = locations as NSArray
         let location = arrayOfLocation.lastObject as! CLLocation
@@ -259,62 +257,53 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         hasLastKnownLocation = true
         
         if (delegate != nil){
-            if((delegate?.respondsToSelector(#selector(LocationManagerDelegate.locationFoundGetAsString(_:longitude:))))!){
-                delegate?.locationFoundGetAsString!(latitudeAsString,longitude:longitudeAsString)
-            }
-            if((delegate?.respondsToSelector(#selector(LocationManagerDelegate.locationFound(_:longitude:))))!){
-                delegate?.locationFound(latitude,longitude:longitude)
-            }
+            delegate?.locationFoundGetAsString(latitudeAsString,longitude:longitudeAsString)
+            
+            delegate?.locationFound(latitude,longitude:longitude)
         }
     }
     
     
-    internal func locationManager(manager: CLLocationManager,
-        didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-            var hasAuthorised = false
-            let verboseKey = status
-            switch status {
-            case CLAuthorizationStatus.Restricted:
-                locationStatus = "Restricted Access"
-            case CLAuthorizationStatus.Denied:
-                locationStatus = "Denied access"
-            case CLAuthorizationStatus.NotDetermined:
-                locationStatus = "Not determined"
-            default:
-                locationStatus = "Allowed access"
-                hasAuthorised = true
-            }
+    public func locationManager(manager: CLLocationManager,
+                                didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        var hasAuthorised = false
+        let verboseKey = status
+        switch status {
+        case CLAuthorizationStatus.Restricted:
+            locationStatus = "Restricted Access"
+        case CLAuthorizationStatus.Denied:
+            locationStatus = "Denied access"
+        case CLAuthorizationStatus.NotDetermined:
+            locationStatus = "Not determined"
+        default:
+            locationStatus = "Allowed access"
+            hasAuthorised = true
+        }
+        
+        verboseMessage = verboseMessageDictionary[verboseKey]!
+        
+        if (hasAuthorised == true) {
+            startLocationManger()
+        }else{
             
-            verboseMessage = verboseMessageDictionary[verboseKey]!
-            
-            if (hasAuthorised == true) {
-                startLocationManger()
-            }else{
+            resetLatLon()
+            if (!locationStatus.isEqualToString("Denied access")){
                 
-                resetLatLon()
-                if (!locationStatus.isEqualToString("Denied access")){
+                var verbose = ""
+                if showVerboseMessage {
                     
-                    var verbose = ""
-                    if showVerboseMessage {
-                        
-                        verbose = verboseMessage
-                        
-                        if ((delegate != nil) && (delegate?.respondsToSelector(#selector(LocationManagerDelegate.locationManagerVerboseMessage(_:))))!){
-                            
-                            delegate?.locationManagerVerboseMessage!(verbose)
-                            
-                        }
-                    }
+                    verbose = verboseMessage
                     
-                    if(completionHandler != nil){
-                        completionHandler?(latitude: latitude, longitude: longitude, status: locationStatus as String, verboseMessage:verbose,error: nil)
-                    }
+                    delegate?.locationManagerVerboseMessage(verbose)
                 }
-                if ((delegate != nil) && (delegate?.respondsToSelector(#selector(LocationManagerDelegate.locationManagerStatus(_:))))!){
-                    delegate?.locationManagerStatus!(locationStatus)
+                
+                if(completionHandler != nil){
+                    completionHandler?(latitude: latitude, longitude: longitude, status: locationStatus as String, verboseMessage:verbose,error: nil)
                 }
             }
-            
+            delegate?.locationManagerStatus(locationStatus)
+        }
+        
     }
     
     
@@ -522,14 +511,22 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
     }
 }
 
-
-@objc protocol LocationManagerDelegate : NSObjectProtocol
+public protocol LocationManagerDelegate : NSObjectProtocol
 {
     func locationFound(latitude:Double, longitude:Double)
-    optional func locationFoundGetAsString(latitude:NSString, longitude:NSString)
-    optional func locationManagerStatus(status:NSString)
-    optional func locationManagerReceivedError(error:NSString)
-    optional func locationManagerVerboseMessage(message:NSString)
+    func locationFoundGetAsString(latitude:NSString, longitude:NSString)
+    func locationManagerStatus(status:NSString)
+    func locationManagerReceivedError(error:NSString)
+    func locationManagerVerboseMessage(message:NSString)
+}
+
+// this results in optional methods without using @objc
+public extension LocationManagerDelegate
+{
+    func locationFoundGetAsString(latitude:NSString, longitude:NSString) {}
+    func locationManagerStatus(status:NSString) {}
+    func locationManagerReceivedError(error:NSString) {}
+    func locationManagerVerboseMessage(message:NSString) {}
 }
 
 private class AddressParser: NSObject{

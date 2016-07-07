@@ -409,11 +409,11 @@ class LocationManager: NSObject,CLLocationManagerDelegate {
         
         self.geocodingCompletionHandler = onGeocodingCompletionHandler
         
-        geoCodeUsignGoogleAddress(address)
+        geoCodeUsingGoogleAddress(address)
     }
     
     
-    private func geoCodeUsignGoogleAddress(address:NSString){
+    private func geoCodeUsingGoogleAddress(address:NSString){
         
         var urlString = "http://maps.googleapis.com/maps/api/geocode/json?address=\(address)&sensor=true" as NSString
         

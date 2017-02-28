@@ -70,9 +70,9 @@ Sample code
             locationManager.autoUpdate = false
             locationManager.startUpdatingLocationWithCompletionHandler { (latitude, longitude, status, verboseMessage, error) -> () in
                 
-                println("lat:\(latitude) lon:\(longitude) status:\(status) error:\(error)")
+                print("lat:\(latitude) lon:\(longitude) status:\(status) error:\(error)")
                 
-                println(verboseMessage)
+                print(verboseMessage)
                 
             }
 
@@ -86,10 +86,10 @@ Sample code
                 
                 if(error != nil){
                     
-                    println(error)
+                    print(error)
                 }else{
                     
-                    println(geocodeInfo!)
+                    print(geocodeInfo!)
                 }
             }
             
@@ -101,10 +101,10 @@ Sample code
                 
                 if(error != nil){
                     
-                    println(error)
+                    print(error)
                 }else{
                     
-                    println(reverseGecodeInfo!)
+                    print(reverseGecodeInfo!)
                 }
                 
             }
@@ -116,10 +116,10 @@ Sample code
                 
                 if(error != nil){
                     
-                    println(error)
+                    print(error)
                 }else{
                     
-                    println(geocodeInfo!)
+                    print(geocodeInfo!)
                 }
                 
             }
@@ -132,10 +132,10 @@ Sample code
                 
                 if(error != nil){
                     
-                    println(error)
+                    print(error)
                 }else{
                     
-                    println(reverseGecodeInfo!)
+                    print(reverseGecodeInfo!)
                 }
             }
 
@@ -162,13 +162,13 @@ Sample code
     
      func locationManagerStatus(status:NSString){
         
-        println(status)
+        print(status)
     }
     
     
     func locationManagerReceivedError(error:NSString){
         
-        println(error)
+        print(error)
         
     }
     
